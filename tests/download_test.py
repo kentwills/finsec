@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from testfixtures import ShouldRaise
 
 from finsec.download import construct_url
+from finsec.download import download_data_from_sec_url
+from finsec.download import submission_generator
 
 
 def test_construct_url_raises_with_greater_than_range():
@@ -29,3 +31,24 @@ def test_construct_url_raises_with_incorrect_quarter_type():
 def test_construct_url_returns_proper_string():
     expected = 'http://www.sec.gov/data/financial-statements/2015q2.zip'
     assert construct_url(2015, 2) == expected
+
+
+def test_download_data_from_sec_url_validates_files():
+    with ShouldRaise(ValueError('url does not contain a valid url: bam')):
+        download_data_from_sec_url('bam')
+
+
+def test_download_data_from_sec_url_all_files():
+    download_data_from_sec_url(construct_url(2009, 1))
+    assert True
+
+
+def test_submission_generator_raises():
+    with ShouldRaise(KeyError("Invalid file name blah.txt, not in ['pre.txt', 'sub.txt', 'readme.htm', 'num.txt', 'tag.txt']")):
+        data = submission_generator(download_data_from_sec_url(construct_url(2009, 1)), 'blah.txt')
+        next(data)
+
+
+def test_submission_generator():
+    data = submission_generator(download_data_from_sec_url(construct_url(2009, 1)), 'sub.txt')
+    next(data)

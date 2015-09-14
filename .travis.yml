@@ -1,0 +1,18 @@
+language: python
+python:
+    # in order of most-valuable tests first
+    - "2.7"
+
+matrix:
+    # notify a failed build as soon as anything fails
+    fast_finish: true
+
+install: pip install -r requirements-dev.txt
+
+script: make test
+
+cache:
+    directories:
+        - $HOME/.pip
+        - $HOME/.pre-commit
+        - $HOME/.cache

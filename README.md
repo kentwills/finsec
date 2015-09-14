@@ -1,2 +1,2 @@
-# finsec
+# finsec [![Build Status](https://travis-ci.org/kentwills/finsec.svg?branch=master)](https://travis-ci.org/kentwills/finsec) [![Coverage Status](https://coveralls.io/repos/kentwills/finsec/badge.svg)](https://coveralls.io/r/kentwills/finsec) [![Documentation Status](https://readthedocs.org/projects/finsec/badge/?version=latest)](https://readthedocs.org/projects/finsec/?badge=latest)
 SDK for retrieving and parsing financial data from the SEC.

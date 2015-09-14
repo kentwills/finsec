@@ -1,0 +1,3 @@
+.tox
+.coverage
+finsec.egg-info/

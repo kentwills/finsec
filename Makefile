@@ -17,6 +17,10 @@ test: .venv.touch
 	$(eval REBUILD_FLAG := --recreate)
 	touch .venv.touch
 
+.PHONY: docs
+docs: .tox/docs
+	tox -e docs
+
 
 .PHONY: clean
 clean:

@@ -5,6 +5,7 @@ from testfixtures import ShouldRaise
 
 from finsec.download import construct_url
 from finsec.download import download_data_from_sec_url
+from finsec.download import get_10Ks
 from finsec.download import submission_generator
 
 
@@ -46,9 +47,17 @@ def test_download_data_from_sec_url_all_files():
 def test_submission_generator_raises():
     with ShouldRaise(KeyError("Invalid file name blah.txt, not in ['pre.txt', 'sub.txt', 'readme.htm', 'num.txt', 'tag.txt']")):
         data = submission_generator(download_data_from_sec_url(construct_url(2009, 1)), 'blah.txt')
-        next(data)
+        for row in data:
+            print(row)
 
 
 def test_submission_generator():
     data = submission_generator(download_data_from_sec_url(construct_url(2009, 1)), 'sub.txt')
-    next(data)
+    for row in data:
+        print(row)
+
+
+def test_get_10Ks():
+    data = get_10Ks(2009, 3)
+    for row in data:
+        print(row)

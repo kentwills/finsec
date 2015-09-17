@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import csv
 from io import BytesIO
+from io import TextIOWrapper
 from urllib.request import urlopen
 from zipfile import ZipFile
 
@@ -44,11 +45,21 @@ def submission_generator(zipfile, name):
         raise KeyError('Invalid file name {0}, not in {1}'.format(name, SEC_FILES))
 
     with zipfile.open(name, 'r') as tsv:
-        csv_reader = csv.reader(utf_8_decoder(tsv), dialect=csv.excel_tab)
+        csv_reader = csv.reader(TextIOWrapper(tsv, encoding='utf-8'), dialect=csv.excel_tab)
         for row in csv_reader:
             yield row
 
 
-def utf_8_decoder(unicode_csv_data):
-    for line in unicode_csv_data:
-        yield line.decode('utf-8')
+def get_10Ks(year, quarter):
+    data = submission_generator(download_data_from_sec_url(construct_url(year, quarter)), 'sub.txt')
+    # Read the column names from the first line of the file
+    fields = next(data)
+    for row in data:
+        items = zip(fields, row)
+        item = {}
+        # Add the value to our dictionary
+        for (name, value) in items:
+            item[name] = value.strip()
+
+        if item.get('form') == '10-K':
+            yield row, item

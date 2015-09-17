@@ -63,3 +63,18 @@ def get_10Ks(year, quarter):
 
         if item.get('form') == '10-K':
             yield row, item
+
+
+def get_numerical_data(year, quarter):
+    data = submission_generator(download_data_from_sec_url(construct_url(year, quarter)), 'num.txt')
+    # Read the column names from the first line of the file
+    fields = next(data)
+    for row in data:
+        items = zip(fields, row)
+        item = {}
+        # Add the value to our dictionary
+        for (name, value) in items:
+            item[name] = value.strip()
+
+        if item.get('form') == '10-K':
+            yield row, item

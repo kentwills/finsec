@@ -25,7 +25,7 @@ def construct_url(year, quarter):
     return BASE_SEC_URL + '{0}q{1}.zip'.format(year, quarter)
 
 
-def download_data_from_sec_url(url):
+def download_data_from_sec(url):
     """takes a url and downloads the data into memory"""
 
     if BASE_SEC_URL not in url:
@@ -33,6 +33,20 @@ def download_data_from_sec_url(url):
 
     url = urlopen(url)
     zipfile = ZipFile(BytesIO(url.read()))
+
+    if set(zipfile.namelist()) != set(SEC_FILES):
+        raise ValueError('Downloaded file set {0} does not match expected {1}'.format(zipfile.namelist(), SEC_FILES))
+    else:
+        return zipfile
+
+
+def local_data_from_sec(file_name):
+    """takes a zipfile and loads the data into memory"""
+
+    if not file_name.endswith('.zip'):
+        raise ValueError('{} is not a zip file'.format(file_name))
+
+    zipfile = ZipFile(file_name)
 
     if set(zipfile.namelist()) != set(SEC_FILES):
         raise ValueError('Downloaded file set {0} does not match expected {1}'.format(zipfile.namelist(), SEC_FILES))
@@ -55,15 +69,15 @@ def sec_file_generator(zipfile, name):
 def get_submissions(year, quarter, form):
     """
     Get SEC Submissions, for a full list of options see: http://www.sec.gov/forms
-    year -- the year of the filing,  2009-2015 
-    quarter -- select forms durin a specific quarter, 1-4
+    year -- the year of the filing,  2009-2015
+    quarter -- select forms during a specific quarter, 1-4
     form -- form type, 10-K, 10-Q etc.
     """
     # get numerical data
-    numerical_data = get_numerical_data(year,quarter)
+    numerical_data = get_numerical_data(year, quarter)
 
     # get submission data
-    data = sec_file_generator(download_data_from_sec_url(construct_url(year, quarter)), 'sub.txt')
+    data = sec_file_generator(download_data_from_sec(construct_url(year, quarter)), 'sub.txt')
     for row in data:
         if row.get('form') == form:
             new_form = Form(row)
@@ -73,7 +87,7 @@ def get_submissions(year, quarter, form):
 
 def get_numerical_data(year, quarter):
     data_dict = {}
-    data = sec_file_generator(download_data_from_sec_url(construct_url(year, quarter)), 'num.txt')
+    data = sec_file_generator(download_data_from_sec(construct_url(year, quarter)), 'num.txt')
     for row in data:
         adsh = row['adsh']
         if data_dict.get(adsh):

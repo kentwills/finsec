@@ -1,11 +1,15 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from unittest.mock import patch
+
 from testfixtures import ShouldRaise
 
+import finsec
 from finsec.download import construct_url
-from finsec.download import download_data_from_sec_url
+from finsec.download import download_data_from_sec
 from finsec.download import get_submissions
+from finsec.download import local_data_from_sec
 from finsec.download import sec_file_generator
 
 
@@ -36,28 +40,30 @@ def test_construct_url_returns_proper_string():
 
 def test_download_data_from_sec_url_validates_files():
     with ShouldRaise(ValueError('url does not contain a valid url: bam')):
-        download_data_from_sec_url('bam')
+        download_data_from_sec('bam')
 
 
-def test_download_data_from_sec_url_all_files():
-    download_data_from_sec_url(construct_url(2009, 1))
+def test_download_data_from_sec_all_files():
+    download_data_from_sec(construct_url(2009, 1))
     assert True
 
 
 def test_sec_file_generator_raises():
     with ShouldRaise(KeyError("Invalid file name blah.txt, not in ['pre.txt', 'sub.txt', 'readme.htm', 'num.txt', 'tag.txt']")):
-        data = sec_file_generator(download_data_from_sec_url(construct_url(2009, 1)), 'blah.txt')
+        data = sec_file_generator(download_data_from_sec(construct_url(2009, 1)), 'blah.txt')
         for row in data:
             print(row)
 
 
 def test_sec_file_generator():
-    data = sec_file_generator(download_data_from_sec_url(construct_url(2009, 1)), 'sub.txt')
+    data = sec_file_generator(download_data_from_sec(construct_url(2009, 1)), 'sub.txt')
     for row in data:
         print(row)
 
 
 def test_get_submissions():
-    data = get_submissions(2009, 3, '10-K')
-    for row in data:
-        print(row)
+    with patch.object(finsec.download, 'download_data_from_sec', return_value=local_data_from_sec('tests/example/2009q3.zip')):
+        data = get_submissions(2009, 3, '10-K')
+        form = next(data)
+        assert form.cik == '1002638'
+        assert form.filed == '20090821'

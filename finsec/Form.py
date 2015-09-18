@@ -1,5 +1,8 @@
-class Submission(object):
+class Form(object):
 
-    def __init__(self, form, variables):
-        self.form = form
-        self.variables = variables
+    def __init__(self, dictionary):
+        for k, v in dictionary.items():
+            setattr(self, k, v)
+
+    def financials(self, dictionary):
+        self.financials = dictionary

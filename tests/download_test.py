@@ -67,3 +67,9 @@ def test_get_submissions():
         form = next(data)
         assert form.cik == '1002638'
         assert form.filed == '20090821'
+
+
+def test_get_submissions_real():
+    data = get_submissions(2011, 2, '10-K')
+    for form in data:
+        print(form.values)

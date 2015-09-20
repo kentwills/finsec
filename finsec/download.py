@@ -81,7 +81,7 @@ def get_submissions(year, quarter, form):
     for row in data:
         if row.get('form') == form:
             new_form = Form(row)
-            new_form.financials(numerical_data.get(row.get('adsh')))
+            new_form.values(numerical_data.get(row.get('adsh')))
             yield new_form
 
 
